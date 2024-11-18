@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUTOPAYIN</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* Basic styling for the form */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 10px 0 5px;
+            color: #555;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result,
+        .error {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .result {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Generate Credit Card</h1>
+        <form id="generateForm">
+            <label for="">BIN</label>
+            <input type="text" id="bin" placeholder="Enter BIN" name="bin" required />
+            <label for="">PK:</label>
+            <input type="text" id="pk" placeholder="Enter PK" name="pk" required />
+            <label for="">Client Secret:</label>
+            <input type="text" id="pics" placeholder="Enter Pics" name="pics" required />
+            <button type="submit">Generate</button>
+        </form>
+
+        <!-- Result Message Section -->
+        <div class="result" id="result">
+
+        </div>
+
+        <!-- Error Message Section -->
+
+    </div>
+
+    <script>
+        document.getElementById("generateForm").addEventListener("submit", async function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Get the input values
+            const bin = document.getElementById("bin").value;
+            const pk = document.getElementById("pk").value;
+            const pics = document.getElementById("pics").value;
+
+            // Show loading state or message
+            document.getElementById("result").innerHTML = "Generating... Please wait.";
+
+            // Send data using fetch API (AJAX)
+            const response = await fetch("/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ bin, pk, pics }), // Sending data as JSON
+            });
+            console.log(response);
+            const result = await response.json(); // Parse JSON response
+
+            // Display the result dynamically without refreshing the page
+            if (result.success) {
+                document.getElementById("result").innerHTML = `
+              <p>Message: ${result.message}</p>
+              <p>Amount: ${result.amount} ${result.currency}</p>
+              <p>Execution Time: ${result.exec_time} seconds</p>
+            `;
+            } else {
+                document.getElementById("result").innerHTML = `
+              <p>Error: ${result.message}</p>
+            `;
+            }
+        });
+    </script>
+</body>
+
+</html>
